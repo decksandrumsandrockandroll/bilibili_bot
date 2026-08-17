@@ -259,4 +259,4 @@ export PATH="$HOME/.local/bin:$PATH"
 
 ---
 
-**祝你签到愉快！🎉**
+**祝b友签到愉快！🎉**
