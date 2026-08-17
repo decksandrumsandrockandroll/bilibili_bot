@@ -1,0 +1,35 @@
+{
+  "container_name": "bili",
+  "webhook_key_file": "{{INSTALL_DIR}}/.bili_webhook_key",
+  "db_path": "{{INSTALL_DIR}}/data/bili_stats.db",
+  "log_dir": "{{INSTALL_DIR}}/logs",
+  "log_retention_days": 30,
+  "max_retries": 3,
+  "retry_base_delay": 5,
+  "use_exponential_backoff": true,
+  "daily_push_dedup": true,
+  "container_auto_start": true,
+  "single_instance_lock": true,
+  "task_cmd_map": {
+    "分享": "ShareVideo",
+    "观看": "WatchVideo",
+    "登录": "Login",
+    "投币": "Coin",
+    "漫画签到": "ComicSign",
+    "漫画阅读": "ComicRead",
+    "银瓜子兑换": "Silver2Coin",
+    "大会员福利": "ReceiveVipPrivilege",
+    "B币券充电": "BiBiCoin"
+  },
+  "push_template": {
+    "daily_header": "📊 **B站每日任务报告**",
+    "period_header": {
+      "weekly": "📅 周报",
+      "monthly": "📊 月报",
+      "quarterly": "📈 季报",
+      "halfyearly": "📉 半年报",
+      "yearly": "📆 年报"
+    },
+    "cookie_invalid": "⚠️ **Cookie 已失效，请重新部署 BiliBiliTool！**\n时间：{time}\n请执行 `./update_cookie.py` 或重新获取 Cookie 并重建容器。"
+  }
+}
