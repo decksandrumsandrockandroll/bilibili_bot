@@ -260,23 +260,17 @@ def parse_detailed(output):
 
     # 大会员福利：已领取视为成功
     if "领取大会员福利" in output:
-                if "结果】成功" in output:
+        if "结果】成功" in output:
             task_status["大会员福利"] = "success"
         else:
             task_status["大会员福利"] = "claimed"
-    else:
-        task_status["大会员福利"] = "unknown"
-
     if "B币券充电" in output:
-                if "充电结果】成功" in output:
+        if "充电结果】成功" in output:
             task_status["B币券充电"] = "success"
         elif "跳过" in output and "目标日期" in output:
             task_status["B币券充电"] = "skipped"
         else:
             task_status["B币券充电"] = "claimed"
-    else:
-        task_status["B币券充电"] = "unknown"
-
     result["tasks"] = task_status
 
     # ========== 增强的失败任务识别（基于上下文） ==========
