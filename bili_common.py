@@ -61,6 +61,8 @@ def run_command(cmd_args, capture=True, check=False):
     result = subprocess.run(full_cmd, capture_output=True, text=True)
     if result.returncode != 0 and check:
         raise RuntimeError(f"命令执行失败: {result.stderr}")
+    # 过滤掉任务状态已经是 success 的失败任务
+    
     return result.stdout + result.stderr
 
 def run_daily():
@@ -258,20 +260,20 @@ def parse_detailed(output):
 
     # 大会员福利：已领取视为成功
     if "领取大会员福利" in output:
-        if "结果】成功" in output or "你已领取过该权益" in output:
+                if "结果】成功" in output:
             task_status["大会员福利"] = "success"
         else:
-            task_status["大会员福利"] = "failure"
+            task_status["大会员福利"] = "claimed"
     else:
         task_status["大会员福利"] = "unknown"
 
     if "B币券充电" in output:
-        if "充电结果】成功" in output:
+                if "充电结果】成功" in output:
             task_status["B币券充电"] = "success"
         elif "跳过" in output and "目标日期" in output:
             task_status["B币券充电"] = "skipped"
         else:
-            task_status["B币券充电"] = "failure"
+            task_status["B币券充电"] = "claimed"
     else:
         task_status["B币券充电"] = "unknown"
 
@@ -325,6 +327,10 @@ def parse_detailed(output):
     # 排除漫画签到（容器不支持单独重试）
     result["failed_tasks"] = [t for t in result["failed_tasks"] if t["display"] != "漫画签到"]
 
+    # 过滤掉任务状态已经是 success 的失败任务
+    result["failed_tasks"] = [t for t in result["failed_tasks"] if result["tasks"].get(t["display"]) not in ("success", "claimed")]
+        # 过滤掉任务状态已经是 success 的失败任务
+    result["failed_tasks"] = [t for t in result["failed_tasks"] if result["tasks"].get(t["display"]) not in ("success", "claimed")]
     return result
 
 # ==================== 重试策略 ====================
@@ -470,7 +476,7 @@ def check_and_send_report(webhook_key, current_date, username):
 
 # ==================== 每日报告推送 ====================
 def send_daily_report(webhook_key, result, retry_records, source="定时任务"):
-    emoji_map = {"success": "✅", "failure": "❌", "skipped": "⏭️", "unknown": "❓"}
+    emoji_map = {"success": "✅", "failure": "❌", "skipped": "⏭️", "claimed": "⭕️", "unknown": "❓"}
     header = PUSH_TEMPLATE.get("daily_header", "📊 **B站每日任务报告**")
     lines = []
     if source == "定时任务":
